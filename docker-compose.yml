@@ -1,0 +1,29 @@
+version: "3"
+
+services:
+  pgsql:
+    image: postgres:11-alpine
+    ports:
+      - "5432:5432"
+    container_name: "localhost_pgsql"
+    restart: always
+    environment:
+      POSTGRES_USER: pguser
+      POSTGRES_PASSWORD: pgpassword
+      POSTGRES_DB: localhost
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data/
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "admin@teste.com"
+      PGADMIN_DEFAULT_PASSWORD: "Admin123"
+    ports:
+      - "8085:80"
