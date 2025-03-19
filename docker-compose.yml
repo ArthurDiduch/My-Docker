@@ -15,7 +15,7 @@ services:
       - ./postgres-data:/var/lib/postgresql/data/
 
   adminer:
-    image: adminer
+    image: adminer:latest
     restart: always
     ports:
       - 8080:8080
@@ -27,9 +27,11 @@ services:
       PGADMIN_DEFAULT_PASSWORD: "Admin123"
     ports:
       - "8085:80"
+    restart: always
 
   mailhog:
     image: mailhog/mailhog
     ports:
       - "1025:1025"
       - "8025:8025"
+    restart: always
