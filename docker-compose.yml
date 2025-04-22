@@ -35,3 +35,9 @@ services:
       - "1025:1025"
       - "8025:8025"
     restart: always
+
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+    restart: always
