@@ -1,24 +1,24 @@
+version: "3"
+
 services:
-  db:
+  pgsql:
     image: postgres:11-alpine
-    container_name: keyloak-postgres
-    hostname: keycloak-postgres
-    volumes:
-      - .docker/dbdata:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    container_name: "localhost_pgsql"
     restart: always
     environment:
       POSTGRES_USER: pguser
       POSTGRES_PASSWORD: pgpassword
-      POSTGRES_DB: keycloak
-    healthcheck:
-      test: ["CMD", "pg_isready", "-U", "pguser", "-d", "keycloak"]
-      interval: 10s
-      timeout: 10s
-      retries: 5
-    networks:
-      - infra-network
+      POSTGRES_DB: localhost
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data/
+
+  adminer:
+    image: adminer:latest
+    restart: always
+    ports:
+      - 8080:8080
 
   pgadmin:
     image: dpage/pgadmin4
@@ -26,7 +26,7 @@ services:
       PGADMIN_DEFAULT_EMAIL: "admin@teste.com"
       PGADMIN_DEFAULT_PASSWORD: "Admin123"
     ports:
-      - "8085:8085"
+      - "8085:80"
     restart: always
 
   mailhog:
@@ -37,48 +37,7 @@ services:
     restart: always
 
   redis:
-    image: redis:8.2-rc1-alpine
-    hostname: redis
-    container_name: redis
+    image: redis
     ports:
       - "6379:6379"
-    networks:
-      - infra-network
-  redis-commander:
-    image: ghcr.io/joeferner/redis-commander:latest
-    container_name: redis-commander
-    hostname: redis-commander
     restart: always
-    environment:
-      - REDIS_HOSTS=local:redis:6379
-    ports:
-      - "6380:6380"
-    user: redis
-    networks:
-      - infra-network
-
-  keycloak:
-    image: quay.io/keycloak/keycloak:26.3.0
-    container_name: keycloak
-    hostname: keycloak
-    command: start-dev
-    ports:
-      - "8080:8080"
-    volumes:
-      - ./themes/passin:/opt/keycloak/themes/passin
-    environment:
-      KC_BOOTSTRAP_ADMIN_USERNAME: admin
-      KC_BOOTSTRAP_ADMIN_PASSWORD: root
-      KC_DB: postgres
-      KC_DB_URL: jdbc:postgresql://db/keycloak
-      KC_DB_USERNAME: pguser
-      KC_DB_PASSWORD: pgpassword
-    depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - infra-network
-
-networks:
-  infra-network:
-    external: true
